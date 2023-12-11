@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Google Maps API with GeoJSON</title>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBPWRyCClc6sWOu2auP42bCgAQS4bEdp9w&callback=initMap"
+        async defer></script>
+    <style>
+        #map {
+            height: 400px;
+            width: 100%;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="map"></div>
+
+    <script>
+        function initMap() {
+            var map = new google.maps.Map(document.getElementById('map'), {
+                center: { lat: 37.7749, lng: -122.4194 },
+                zoom: 12
+            });
+
+            // Example GeoJSON data for points, lines, and polygons
+            var geojson = {
+                type: 'FeatureCollection',
+                features: [
+                    {
+                        type: 'Feature',
+                        geometry: {
+                            type: 'Point',
+                            coordinates: [-122.4194, 37.7749]
+                        },
+                        properties: {
+                            name: 'Marker 1'
+                        }
+                    },
+                    {
+                        type: 'Feature',
+                        geometry: {
+                            type: 'Point',
+                            coordinates: [-122.4294, 37.7849]
+                        },
+                        properties: {
+                            name: 'Marker 2'
+                        }
+                    },
+                    {
+                        type: 'Feature',
+                        geometry: {
+                            type: 'LineString',
+                            coordinates: [
+                                [-122.4194, 37.7749],
+                                [-122.4294, 37.7849]
+                            ]
+                        },
+                        properties: {
+                            name: 'Line Feature',
+                            description: 'A line connecting Marker 1 and Marker 2'
+                        }
+                    },
+                    {
+                        type: 'Feature',
+                        geometry: {
+                            type: 'Polygon',
+                            coordinates: [
+                                [
+                                    [-122.4194, 37.7749],
+                                    [-122.4294, 37.7749],
+                                    [-122.4294, 37.7849],
+                                    [-122.4194, 37.7849],
+                                    [-122.4194, 37.7749]
+                                ]
+                            ]
+                        },
+                        properties: {
+                            name: 'Polygon Feature',
+                            description: 'A polygon around Marker 1 and Marker 2'
+                        }
+                    }
+                ]
+            };
+
+            // Add GeoJSON data to the map
+            map.data.addGeoJson(geojson);
+
+            // Set up an info window to display feature properties
+            var infoWindow = new google.maps.InfoWindow();
+
+            // Event listener to display information when a feature is clicked
+            map.data.addListener('click', function (event) {
+                var properties = event.feature.getPropertyNames();
+                var content = '<h2>' + event.feature.getProperty('name') + '</h2>';
+                properties.forEach(function (property) {
+                    if (property !== 'name') {
+                        content += '<strong>' + property + ':</strong> ' + event.feature.getProperty(property) + '<br>';
+                    }
+                });
+                infoWindow.setContent(content);
+                infoWindow.setPosition(event.feature.getGeometry().get());
+                infoWindow.setOptions({ pixelOffset: new google.maps.Size(0, -30) });
+                infoWindow.open(map);
+            });
+        }
+    </script>
+</body>
+
+</html>
